@@ -13,9 +13,9 @@ Specifically:
 
 Content | Link
 --------|---------
-Readme file of Homework 6 | \[[Readme](https://github.com/STAT545-UBC-students/hw05-chenchenguo/blob/master/README.md)\]
+Readme file of Homework 6 | \[[Readme](https://github.com/STAT545-UBC-students/hw06-chenchenguo/blob/master/README.md)\]
 Rmarkdown source code | \[[Rmd](https://github.com/STAT545-UBC-students/hw06-chenchenguo/blob/master/hw06-Data%20wrangling%20wrap%20up.Rmd)\]
-Markdown document | \[[md]()\]
+Markdown document | \[[md](https://github.com/STAT545-UBC-students/hw06-chenchenguo/blob/master/hw06-Data_wrangling_wrap_up.md)\]
 
 
 Thank you.
