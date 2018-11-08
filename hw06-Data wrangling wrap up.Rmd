@@ -134,12 +134,15 @@ vec_6 <- c("s","o","s")
 
 ## 14.3.1.1 Exercises
 ###1. Explain why each of these strings don't match a \: "\","\\","\\\"?
-```{r}
-
-```
-
+    ANS: Since "\" used as a literal meaning, there needs an escape character "\" to creat regular expression. Then use a "\" to find it, and this find backslash also needs an escape character "\", Hence there are total four backslashs.
+    
 ###2. How would you match the sequence "'\?
 ```{r}
+vec_31 <- "\"'\\m"
+vec_31
+vv<- "s"
+vv
+str_view(vec_31, pattern = "\"\\'\\\\", match = TRUE)
 
 ```
 
