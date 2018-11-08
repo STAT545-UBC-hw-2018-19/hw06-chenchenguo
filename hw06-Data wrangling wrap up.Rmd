@@ -1,7 +1,7 @@
 ---
 title: "Hw-06-ChenchenGuo"
 author: "Chenchen GUO"
-date: "October 30, 2018"
+date: "NOV 7th, 2018"
 output: github_document
 always_allow_html: yes
 ---
@@ -15,17 +15,12 @@ always_allow_html: yes
 
     -[Implementation](#implementation)
 
--   [Part2: File I/O](#part-2-file-io)
+-   [Part2: Writing functions](#part-2-writing-functions)
 
     -[Requirements2](#requirements2)
 
     -[Implementation2](#implementation2)
 
--   [Part3: Visualization design](#part-3-visualization-design)
-
-    -[Requirements3](#requirements3)
-
-    -[Implementation3](#implementation3)
 
 
 Introduction
@@ -57,8 +52,10 @@ suppressPackageStartupMessages(library(gapminder))
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(kableExtra))
+suppressPackageStartupMessages(library(stringi))
 suppressPackageStartupMessages(library(broom))
-suppressPackageStartupMessages(library(MASS))
+suppressPackageStartupMessages(library(forecast))
 ```
 
 ## 14.2.5 Exercises
@@ -140,23 +137,29 @@ vec_6 <- c("s","o","s")
 ```{r}
 vec_31 <- "\"'\\m"
 vec_31
-vv<- "s"
-vv
 str_view(vec_31, pattern = "\"\\'\\\\", match = TRUE)
 
 ```
 
 ##3. What patterns will the regular expression \..\..\.. match? How to represent it as a string?
 ```{r}
-
+vec_312 <- "\\..\\..\\.."
+writeLines(vec_312)
 ```
+
+"\\\\" for detect "\", "\\." for detecting "."
+```{r}
+str_detect(vec_312,"\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.")
+```
+
 
 
 ##14.3.2.1 Exercises
 ### 1. How would you match the literal string "$^$"?
 ```{r}
-
-
+vec_321 <- "a$^$b"
+vec_321
+str_view(vec_321, pattern = "\\$\\^\\$", match = TRUE)
 ```
 
 ### 2. Given the corpus of common words in stringr::words, create regular expressions that find all words that: 
@@ -166,100 +169,151 @@ str_view(vec_31, pattern = "\"\\'\\\\", match = TRUE)
         4. Have seven letters or more.
         
 ```{r}
+str_subset(words, "^y")
 
+str_subset(words, "x$")
+
+str_subset(words, "^...$") %>% head(10)
+
+str_subset(words, "^.......") %>% head(10)
 ```
 
 ## 14.3.3.1 Exercises
+    \d: matches any digit.
+    \s: matches any whitespace (e.g. space, tab, newline).
+    [abc]: matches a, b, or c.
+    [^abc]: matches anything except a, b, or c.
+    
 ### 1. Create regular expressions to find all words that:
         1. Start with a vowel.
-        2. That only contains constants.
+        2. That only contains consonants.
         3. End with ed, but not with eed.
         4. End with ing or ise.
 ```{r}
 
+str_subset(words, "^[aeiou]") %>% head(10)
+
+str_subset(words, "^[^aeiou]+$")
+
+str_subset(words, "[^e]ed$")
+
+str_subset(words, "i(ng|se)$")
 ```
 
 ### 2. Empirically verify the rule "i before e except after c"?
 ```{r}
-
-
+str_subset(words, "[^c]i[e]")
 ```
 
 ### 3. Is "q" always followed by a "u"?
 ```{r}
-
+str_view(words, pattern = "q[^u]", match = TRUE)
 ```
 
 ### 4. Write a regular expression that matches a word if its probably written in British English, not American English?
 ```{r}
+wlist <- c("colour", "color", "flavour", "flavor")
 
+str_subset(wlist, ".+or$")
 ```
 
 ### 5. Create a regular expression that will match telephone numbers as commonly written in your country?
 ```{r}
-
+tel_numbers <- c("+1 687 8885 6837", "+44 756 8743 8831", "+86 138 8732 8471")
+str_subset(tel_numbers, "^\\+86")
 ```
 
 ## 14.3.4.1 Exercises
 ### 1. Describe the equivalents of ?, +, * in {m,n} form.
-```{r}
-
-```
+    ? === {0,1}
+    + === {1,}
+    * === {0,}
+    
 ### 2. Describe in words what these regular expressions match: 
     1. ^.*$
+    Matches any string.
+    
     2. "\\{.+\\}"
+    Matches any {} form
+    
     3. \d{4}-\d{2}-\d{2}
+    Matches dddd-dd-dd
+    
     4. "\\\\{4}"
-```{r}
+    Matches "\\\\"
 
-```
 
 ### 3. Create regular expressions to find all words that:
     1. Start with three consonants.
     2. Have three or more vowels in a row.
     3. Have two or more vowel-consonant pairs in a row.
 ```{r}
+str_subset(words, "^[^aeiou]{3}")
 
+str_subset(words, "[aeiou]{3,}")
+
+str_subset(words, "[aeiou][^aeiou]{2,}") %>% head(10)
 ```
 
 ## 14.3.5.1 Exercises
 ### 1. Describe in words what these expressions will match:
     1. (.)\1\1
+    Matches like: "a\1\1", cause it should be \\.
+    
     2. "(.)(.)\\2\\1"
+    Matches like: "abba", "cddc"
+    
     3. (..)\1
+    Matches like "ab\1"
+    
     4. "(.).\\1.\\1"
+    Matches a string  whose first vector also appears at the third and the fifth place.
+    
     5. "(.)(.)(.).*\\3\\2\\1"
-```{r}
+    Matches like "abc- anything - cba"
 
-```
+
 ### 2. Construct regular expressions to match words that:
     1. Start and end with the same character.
     2. Contain a repreated pair of letters.
     3. Contain one letter repeated in at least three places.
 ```{r}
+str_subset(words, "^(.).*\\1$") %>% head(10)
 
+str_subset(words, "(..).*\\1") %>% head(10)
+
+str_subset(words, "(.).*\\1.*\\1") %>% head(10)
 ```
 
 ## 14.4.2 Exercises
 ### 1. For each of the following challenges, solve it by using both a singular expression and a combination of multiple str_detect() calls.
     1. Find all words that start or end with x.
-    2. Find all words that start with a vowel and end with a constant.
+    2. Find all words that start with a vowel and end with a consonant.
     3. Are there any words that contain at least one of each different vowel?
 ```{r}
+str_subset(words, "^x|x$")
+
+str_subset(words, "^[aeiou].*[^aeiou]$") %>% head(10)
+
+str_subset(words, "(?=.*a.*)(?=.*e.*)(?=.*i.*)(?=.*o.*)(?=.*u.*)")
 
 ```
 
 ### 2. What word has the highest number of vowels? What words has the highest proportion of vowels?
 ```{r}
+# Highest number of vowels
+str_count(words, "[aeiou]") %>% max()
+paste(words[str_count(words,"[aeiou]")==5])
+
+# Highest proportion of vowels
+vowelnumber <- str_count(words, "[aeiou]")
+numberofwords <- str_count(words)
+paste(words[max(vowelnumber/numberofwords)])
 
 ```
 
 ## 14.4.3.1 Exercises
-### 1. In the previous example, you might have noticed that the regular expression matched "flickered", which is not a colour. Modify the regex to fix the problem.
-```{r}
 
-
-```
 
 ### 2. From the Harvard sentences data, extract:
     1. The first word from each sentence.
@@ -267,61 +321,95 @@ str_view(vec_31, pattern = "\"\\'\\\\", match = TRUE)
     3. All plurals.
     
 ```{r}
+#The first word from each sentence
+str_extract(sentences, pattern = "[a-zA-Z]+") %>% head(10)
 
+#all words ending in ing
+sent<- str_subset(sentences, "([^ ]+)ing")
+str_extract(sent, "([^ ]+ing)")
+
+# all plurals
+plurals <- str_subset(sentences, "([^ ]+)s|([^ ]+)es")
+str_extract(plurals, "([^ ]+)s|([^ ]+)es") %>% head(10)
 ```
 
 ## 14.4.4.1 Exercises
 ### 1. Find all words that come after a "number" like "one", "two", "three"etc. Pull out both the number and the word.
 ```{r}
-
+numbers <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+numb_match <- str_c(numbers, collapse = "|")
+numb_match
+# with next word
+numb_match1  <- str_c("(", numb_match, ") ([a-zA-Z]+)")
+numb_match1
+has_number <- str_subset(sentences, numb_match1)
+matc <- str_extract(has_number, numb_match1)
+matc
 ```
 
 ### 2. Find all contractions, separate out the pieces before and after the apostrophe.
 ```{r}
-
+has_contraction <- str_subset(sentences, "\\'")
+word_contraction <- str_extract(has_contraction, "([A-Za-z]+)'([a-zA-Z]+)")
+word_contraction
+# split up
+word_contr_split <- str_split(word_contraction, "'")
+word_contr_split
 ```
 
 ## 14.4.5.1 Exercises
 ### 1. Replace all forward slashes in a string with backslashes.
 ```{r}
-
+forslash <- c("asd/jkd", "bj/ojh","bhu/iju")
+str_replace_all(forslash, "/", "\\\\") %>% 
+    writeLines()
 ```
 
 ### 2. Implement a simple version of str_to_lower() using replace_all()
 ```{r}
-
+str_replace_all(sentences, ".", tolower) %>% head(10)
 ```
 
 ### 3. Switch the first and last letters in words. Which of those strings are still words?
 ```{r}
-
+new_word <- str_replace(words, "(^[a-zA-Z])([a-zA-Z]*)([a-zA-Z]$)", "\\3\\2\\1")
+intersect(words, new_word)
 ```
 
 ## 14.4.6.1 Exercises
 ### 1. Split up a string like "apples, pears, and bananas" into individual components.
 ```{r}
-
+fruitstring <- "apples, pears, and bananas"
+str_split(fruitstring, boundary("word"))
 ```
 
 ### 2. Why is it better to split up by boundary("word") than " "?
-```{r}
-
-```
+    If using the " " , the punctuation will also be separated.
 
 ### 3. What does splitting with an empty string ("")do? 
-```{r}
-
-```
+    To separate each word of a string.
 
 
 ## 14.5.1 Exercises
 ### 1. How would you find all strings containing \ with regex() vs. with fixed()?
 ```{r}
-
+vec_51 <- c("exercise\\51")
+vec_51
+str_view(vec_51, pattern = "\\\\")
+str_view(vec_51, pattern = fixed("\\"))
 ```
 
 ### 2. What are the five most common words in sentences?
 ```{r}
+wordnumber <- str_split(sentences, boundary("word")) %>% 
+    unlist() %>% 
+    str_to_lower() 
+# find the number of words and list 
+wordnumber %>% 
+    enframe() %>% 
+    group_by(value) %>% 
+    count() %>% 
+    arrange(desc(n)) %>% head(5)
 
 ```
 
@@ -331,23 +419,143 @@ str_view(vec_31, pattern = "\"\\'\\\\", match = TRUE)
         2. Find duplicated strings.
         3. Generate random text.
 ```{r}
+#count the number of words
+sen71 <- sentences %>% head(1)
+sen71
+stri_count_words(sen71)
 
+#duplicated strings
+
+sen_duplicated <- c("apple", "apple", "banana", "orange", "orange")
+stri_duplicated(sen_duplicated)
+
+
+#Generate random text of 5 each has length of 10
+stri_rand_strings(5, 10 , pattern = "[a-z]")
 ```
 
-### 2. How do you control the language that stri_sort() using for sorting?
+
+
+Part 2: Writing functions
+-------------------------
+
+Requirements2
+-------------
+
+write one or more functions that do something useful to gapminder data.
+
+Implementation2
+---------------
+Implement a function on dataframe of Japan
 ```{r}
 
+Dfjapan <- gapminder %>% 
+    filter(country=="Japan")
+
+
 ```
 
+Here I used a quadratic regression (with a squared term) for Japan's lifeexpectancy.
+
+Firstly, lets compare the linear and quadratic  of Japan's lifeExp
+
+```{r}
+Dfjapan %>% 
+    ggplot(aes(year, lifeExp)) +
+    geom_point()+
+    geom_smooth(method = "lm", color = "red", se = FALSE)+
+    geom_smooth(method = "lm", formula = y~x+I(x^2), color = "blue", se = FALSE)+
+    theme_bw()+
+    theme(
+    axis.text = element_text(size = 10))+
+  ggtitle("Life expectation of Japan")
+
+model <- lm(lifeExp ~ year + I(year^2), Dfjapan)
+summary(model)
+```
+
+From the plot, it looks like the life expectancy fits well on quadratic model.
+Here the factor I is to reinforce the effect of the qudratic term. 
+What if we didnot use the I factor?
+
+```{r}
+Dfjapan %>% 
+    ggplot(aes(year, lifeExp)) +
+    geom_point()+
+    geom_smooth(method = "lm", formula = y~x+(x^2), color = "blue", se = FALSE)+
+    theme_bw()+
+    theme(
+    axis.text = element_text(size = 10))+
+  ggtitle("Life expectation of Japan")
+
+```
+
+To find the best fitting curve we need to find the most related factor.
+```{r}
+# The coefficient result of model without I factor is not correct, which can seen from the huge negative intercept value. This value represents the life expectancy at year 1952. Apparently its not negative.
+
+coef(lm(lifeExp ~ year + year^2, Dfjapan))
+
+# The coefficient result of model with I factor:
+
+coef(lm(lifeExp ~ year + I(year^2), Dfjapan))
+
+# This result is also not correct with huge intercept. And since the first year of dataframe is 1952, let's substract year 1952 to get the coefficient and the result is more reasonable.
+
+coef(lm(lifeExp ~ I(year-1952) + I(year^2-1952^2), Dfjapan))
 
 
+```
+
+The handy function is aim to anticipate the life expectancy from year 2012, 2017 to 2022 of japan
+```{r}
+
+model3 <-lm(lifeExp ~ I(year-1952) + I(year^2-1952^2), Dfjapan)
+summary(model3)
+
+# Here use library forecast to anticipate data
+
+modelarima <- arima(Dfjapan$lifeExp, order = c(1, 3,5))
+forecast_1 <- forecast(modelarima, h=3, level=c(11.5))
+print(forecast_1)
+
+# The final handy function of anticipating lifeExpectancy 
+
+anticipate <- function(country_lifeexp){
+    modelarima <- arima(country_lifeexp, order = c(1, 3,5))
+    forecast_1 <- forecast(modelarima, h=3, level=c(11.5))
+    print(forecast_1)
+}
+
+```
+
+compare with the original life Expectancy data with the anticipated data
+
+```{r}
+knitr::kable(Dfjapan) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+anticipate(Dfjapan$lifeExp)
+```
+
+After comparison, the data is properly anticipated according to original lifeexpectancy of japan
 
 
+Let's test on another country Canada
 
+```{r}
+Dfcanada <- gapminder %>% 
+    filter(country=="Canada")
 
+knitr::kable(Dfcanada) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 
+```
 
-
+```{r}
+anticipate(Dfcanada$lifeExp)
+# The results showed this anticipated function also worked on Canada's lifeExp
+```
 
 
 
