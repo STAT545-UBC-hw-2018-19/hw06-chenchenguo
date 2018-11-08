@@ -3,11 +3,8 @@ This is the repo for homework 6 from Chenchen Guo
 The aim of hw-06 is to reinforce the use of data wrangling and functions use.
 Specifically:
   * Character data
-  * Writing functions
-  * work with the candy data
-  * work with the singer data
-  * Work with a list
-  * Work with a nested data frame
+  * Writing functions: Use Library forecast to anticipate countries' future Life expectancy
+  
 
 
 
